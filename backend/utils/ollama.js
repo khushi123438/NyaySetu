@@ -32,7 +32,7 @@ export const askOllama = async (message, history = []) => {
     options: {
       temperature: 0.2,
       top_p: 0.9,
-      num_predict: 200
+      num_predict: 1024
     }
   }
 );

@@ -2,7 +2,7 @@ import fs from "fs";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 import mammoth from "mammoth";
 
-import { askOllama } from "../utils/ollama.js";
+import { runChatbotPipeline } from "../utils/chatbotPipeline.js";
 
 async function extractPdfText(filePath) {
   const data = new Uint8Array(fs.readFileSync(filePath));
@@ -73,22 +73,13 @@ export const analyzeDocument = async (req, res) => {
       });
     }
 
- const prompt = `
-You are NyaySetu AI.
+    const userQuery = req.body.message || "Is document ke according mujhe kya karna chahiye?";
 
-Document:
-
-${extractedText}
-
-User Question:
-
-${req.body.message || "Analyze this document."}
-
-Answer ONLY using the uploaded document.
-If the answer is not available in the document, clearly mention it.
-`;
-
-const analysis = await askOllama(prompt);
+    const analysis = await runChatbotPipeline({
+      message: userQuery,
+      documentText: extractedText,
+      history: []
+    });
 
     fs.unlinkSync(req.file.path);
 

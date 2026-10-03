@@ -1,11 +1,11 @@
 import AIChat from "../models/AIChat.js";
-import { askOllama } from "../utils/ollama.js";
+import { runChatbotPipeline } from "../utils/chatbotPipeline.js";
 
 export const chatWithAI = async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, documentText } = req.body;
 
-    if (!message?.trim()) {
+    if (!message?.trim() && !documentText?.trim()) {
       return res.status(400).json({
         success: false,
         message: "Message is required.",
@@ -24,10 +24,11 @@ export const chatWithAI = async (req, res) => {
       });
     }
 
-const aiReply = await askOllama(
-    message,
-    chat.messages
-);
+    const aiReply = await runChatbotPipeline({
+      message: message || "Analyze query",
+      documentText: documentText || "",
+      history: chat.messages
+    });
 
 
     chat.messages.push({
