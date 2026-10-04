@@ -1,9 +1,8 @@
 import jwt from "jsonwebtoken";
 
-const authMiddleware = (req, res, next) => {
+export const authMiddleware = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
-  
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({ success: false, message: "No token provided" });
@@ -20,5 +19,20 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-export default authMiddleware;
+export const optionalAuthMiddleware = (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1];
+      if (token && token !== "null" && token !== "undefined") {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = { id: decoded.userId, role: decoded.role };
+      }
+    }
+  } catch (error) {
+    // Ignore error for optional auth
+  }
+  next();
+};
 
+export default authMiddleware;

@@ -1,5 +1,5 @@
 import express from "express";
-import authMiddleware from "../middlewares/authMiddleware.js";
+import { optionalAuthMiddleware } from "../middlewares/authMiddleware.js";
 import {
   chatWithAI,
   healthCheck,
@@ -11,9 +11,9 @@ const router = express.Router();
 
 router.get("/health", healthCheck);
 
-// Protected routes
-router.post("/chat", authMiddleware, chatWithAI);
-router.get("/history", authMiddleware, getChatHistory);
-router.delete("/history", authMiddleware, clearChatHistory);
+// Optional auth enabled: Works for both logged in users (with MongoDB persistence) and guest users
+router.post("/chat", optionalAuthMiddleware, chatWithAI);
+router.get("/history", optionalAuthMiddleware, getChatHistory);
+router.delete("/history", optionalAuthMiddleware, clearChatHistory);
 
 export default router;
